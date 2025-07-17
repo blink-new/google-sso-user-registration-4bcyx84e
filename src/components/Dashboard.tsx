@@ -7,6 +7,7 @@ import { Separator } from '@/components/ui/separator'
 import { LogOut, Mail, Phone, Building, Briefcase, Calendar, Edit } from 'lucide-react'
 import { User, UserProfile } from '@/types/user'
 import { blink } from '@/blink/client'
+import { db } from '@/utils/database'
 
 interface DashboardProps {
   user: User
@@ -20,13 +21,9 @@ export function Dashboard({ user, onEditProfile }: DashboardProps) {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const profiles = await blink.db.userProfiles.list({
-          where: { userId: user.id },
-          limit: 1
-        })
-        
-        if (profiles.length > 0) {
-          setUserProfile(profiles[0])
+        const profile = await db.findProfileByUserId(user.id)
+        if (profile) {
+          setUserProfile(profile)
         }
       } catch (error) {
         console.error('Error fetching user profile:', error)

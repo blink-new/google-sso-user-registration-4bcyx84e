@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { CheckCircle, Loader2 } from 'lucide-react'
 import { ProfileFormData, User } from '@/types/user'
 import { blink } from '@/blink/client'
+import { db } from '@/utils/database'
 
 interface ProfileCompletionProps {
   user: User
@@ -67,7 +68,7 @@ export function ProfileCompletion({ user, onProfileComplete }: ProfileCompletion
     
     try {
       // Create user profile
-      await blink.db.userProfiles.create({
+      await db.createProfile({
         id: `profile_${Date.now()}`,
         userId: user.id,
         organization: formData.organization,
@@ -76,7 +77,7 @@ export function ProfileCompletion({ user, onProfileComplete }: ProfileCompletion
       })
       
       // Update user profile completion status
-      await blink.db.users.update(user.id, {
+      await db.updateUser(user.id, {
         profileCompleted: true
       })
       

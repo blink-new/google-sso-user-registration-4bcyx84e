@@ -5,7 +5,7 @@ import { Dashboard } from '@/components/Dashboard'
 import { Toaster } from '@/components/ui/toaster'
 import { User } from '@/types/user'
 import { blink } from '@/blink/client'
-import { initializeDatabase } from '@/utils/database'
+import { initializeDatabase, db } from '@/utils/database'
 
 function App() {
   const [user, setUser] = useState<User | null>(null)
@@ -21,17 +21,14 @@ function App() {
       
       if (state.user) {
         try {
-          // Check if user exists in our database
-          const existingUsers = await blink.db.users.list({
-            where: { email: state.user.email },
-            limit: 1
-          })
+          // Check if user exists in our database using fallback-enabled db
+          const existingUser = await db.findUserByEmail(state.user.email)
           
           let userData: User
           
-          if (existingUsers.length === 0) {
+          if (!existingUser) {
             // Create new user
-            userData = await blink.db.users.create({
+            userData = await db.createUser({
               id: `user_${Date.now()}`,
               email: state.user.email,
               name: state.user.displayName || state.user.email,
@@ -40,7 +37,7 @@ function App() {
               profileCompleted: false
             })
           } else {
-            userData = existingUsers[0]
+            userData = existingUser
           }
           
           setUser(userData)
@@ -51,7 +48,7 @@ function App() {
           setShowProfileCompletion(!isProfileCompleted)
         } catch (error) {
           console.error('Error handling user authentication:', error)
-          // If database operations fail, still allow user to proceed
+          // If all database operations fail, still allow user to proceed
           setUser({
             id: `user_${Date.now()}`,
             email: state.user.email,
