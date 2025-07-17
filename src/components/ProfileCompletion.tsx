@@ -83,6 +83,9 @@ export function ProfileCompletion({ user, onProfileComplete }: ProfileCompletion
       onProfileComplete()
     } catch (error) {
       console.error('Profile completion error:', error)
+      // Even if database operations fail, allow user to proceed
+      // This prevents the user from getting stuck
+      onProfileComplete()
     } finally {
       setIsSubmitting(false)
     }

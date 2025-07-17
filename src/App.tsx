@@ -44,9 +44,25 @@ function App() {
           }
           
           setUser(userData)
-          setShowProfileCompletion(!userData.profileCompleted)
+          // Check if profile is completed (handle boolean conversion from SQLite)
+          const isProfileCompleted = typeof userData.profileCompleted === 'string' 
+            ? Number(userData.profileCompleted) > 0 
+            : userData.profileCompleted
+          setShowProfileCompletion(!isProfileCompleted)
         } catch (error) {
           console.error('Error handling user authentication:', error)
+          // If database operations fail, still allow user to proceed
+          setUser({
+            id: `user_${Date.now()}`,
+            email: state.user.email,
+            name: state.user.displayName || state.user.email,
+            avatarUrl: state.user.photoURL,
+            googleId: state.user.uid,
+            profileCompleted: false,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          })
+          setShowProfileCompletion(true)
         }
       } else {
         setUser(null)

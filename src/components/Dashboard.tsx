@@ -30,6 +30,8 @@ export function Dashboard({ user, onEditProfile }: DashboardProps) {
         }
       } catch (error) {
         console.error('Error fetching user profile:', error)
+        // If database fetch fails, continue without profile data
+        // This prevents the dashboard from being stuck in loading state
       } finally {
         setIsLoading(false)
       }
@@ -105,15 +107,15 @@ export function Dashboard({ user, onEditProfile }: DashboardProps) {
                     <span className="text-sm text-gray-600">{user.email}</span>
                   </div>
                   <Badge variant="secondary" className="bg-green-100 text-green-800">
-                    Profile Complete
+                    {userProfile ? 'Profile Complete' : 'Profile Pending'}
                   </Badge>
                 </div>
               </CardHeader>
               
-              {userProfile && (
-                <CardContent className="space-y-4">
-                  <Separator />
-                  
+              <CardContent className="space-y-4">
+                <Separator />
+                
+                {userProfile ? (
                   <div className="space-y-3">
                     <div className="flex items-center space-x-3">
                       <Building className="h-4 w-4 text-gray-500" />
@@ -147,19 +149,24 @@ export function Dashboard({ user, onEditProfile }: DashboardProps) {
                       </div>
                     </div>
                   </div>
-                  
-                  <Separator />
-                  
-                  <Button
-                    onClick={onEditProfile}
-                    variant="outline"
-                    className="w-full"
-                  >
-                    <Edit className="mr-2 h-4 w-4" />
-                    Edit Profile
-                  </Button>
-                </CardContent>
-              )}
+                ) : (
+                  <div className="text-center py-4">
+                    <p className="text-sm text-gray-500 mb-3">Profile information not available</p>
+                    <p className="text-xs text-gray-400">Complete your profile to see details here</p>
+                  </div>
+                )}
+                
+                <Separator />
+                
+                <Button
+                  onClick={onEditProfile}
+                  variant="outline"
+                  className="w-full"
+                >
+                  <Edit className="mr-2 h-4 w-4" />
+                  {userProfile ? 'Edit Profile' : 'Complete Profile'}
+                </Button>
+              </CardContent>
             </Card>
           </div>
 
@@ -170,16 +177,16 @@ export function Dashboard({ user, onEditProfile }: DashboardProps) {
               <CardHeader>
                 <CardTitle className="text-2xl">Welcome back, {user.name.split(' ')[0]}! 👋</CardTitle>
                 <CardDescription>
-                  Your profile is complete and you're all set to get started.
+                  {userProfile ? "Your profile is complete and you're all set to get started." : "Please complete your profile to get started."}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="p-4 bg-blue-50 rounded-lg">
                     <h3 className="font-medium text-blue-900 mb-2">Account Status</h3>
-                    <p className="text-sm text-blue-700">✅ Profile Complete</p>
+                    <p className="text-sm text-blue-700">{userProfile ? '✅' : '⏳'} Profile {userProfile ? 'Complete' : 'Pending'}</p>
                     <p className="text-sm text-blue-700">✅ Email Verified</p>
-                    <p className="text-sm text-blue-700">✅ Ready to Use</p>
+                    <p className="text-sm text-blue-700">{userProfile ? '✅' : '⏳'} {userProfile ? 'Ready to Use' : 'Setup Required'}</p>
                   </div>
                   <div className="p-4 bg-green-50 rounded-lg">
                     <h3 className="font-medium text-green-900 mb-2">Quick Actions</h3>
@@ -189,7 +196,7 @@ export function Dashboard({ user, onEditProfile }: DashboardProps) {
                       size="sm"
                       className="w-full mb-2"
                     >
-                      Update Profile
+                      {userProfile ? 'Update Profile' : 'Complete Profile'}
                     </Button>
                     <Button
                       variant="outline"
