@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Progress } from '@/components/ui/progress'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { CheckCircle, Loader2 } from 'lucide-react'
+import { CheckCircle, Loader2, LogOut } from 'lucide-react'
 import { ProfileFormData, User } from '@/types/user'
 import { blink } from '@/blink/client'
 import { db } from '@/utils/database'
@@ -92,12 +92,25 @@ export function ProfileCompletion({ user, onProfileComplete }: ProfileCompletion
     }
   }
 
+  const handleLogout = () => {
+    blink.auth.logout()
+  }
+
   const progress = Object.values(formData).filter(value => value.trim()).length / 3 * 100
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center p-4">
       <Card className="w-full max-w-lg shadow-xl border-0">
-        <CardHeader className="text-center space-y-4">
+        <CardHeader className="text-center space-y-4 relative">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleLogout}
+            className="absolute top-0 right-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+          >
+            <LogOut className="h-4 w-4 mr-1" />
+            Logout
+          </Button>
           <div className="flex justify-center">
             <Avatar className="w-20 h-20 border-4 border-white shadow-lg">
               <AvatarImage src={user.avatarUrl} alt={user.name} />
